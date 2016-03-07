@@ -9,7 +9,7 @@ namespace MOTHER3
     {
         public static int Address = 0xD0D28;
         public static int Length = 144;
-        public static int Entries = 256;
+        public static int Entries = 257;
         public static EnemyData[] Enemies = new EnemyData[Entries];
         
         private int index;
@@ -49,112 +49,150 @@ namespace MOTHER3
             Rom.Seek (Address);
             for (int i = 0; i < EnemyData.Entries; i++)
             {
+
                 EnemyData e = new EnemyData();
                 e.index = i;
-                
-                Rom.SeekAdd (0xA);
-
-                e.Bg = Rom.ReadUShort();
-                e.MusicSwirl = Rom.ReadUShort();
-                e.MusicBattle = Rom.ReadUShort();
-                e.MusicWin = Rom.ReadUShort();
-
-                e.Level = Rom.ReadUShort ();
-                e.Hp = Rom.ReadUInt ();
-                e.Pp = Rom.ReadUInt ();
-                e.Off = Rom.ReadByte ();
-                e.Def = Rom.ReadByte ();
-                e.Iq = Rom.ReadByte ();
-                e.Speed = Rom.ReadByte ();
-                
-                Rom.SeekAdd (4);
-                
-                e.OffBack = Rom.ReadByte ();
-                e.DefBack = Rom.ReadByte ();
-                e.IqBack = Rom.ReadByte ();
-                e.SpeedBack = Rom.ReadByte ();
-                
-                Rom.SeekAdd (4);
-
-                for (int j = 0; j < e.Weaknesses.Length; j++)
-                    e.Weaknesses[j] = Rom.ReadUShort();
-
-                for (int j = 0; j < e.Action.Length; j++)
-                    e.Action[j] = Rom.ReadUShort();
-
-                Rom.SeekAdd(2);
-
-                e.TextEncounter = Rom.ReadByte();
-                e.TextDeath = Rom.ReadByte();
-
-                Rom.SeekAdd(0x10);
-
-                for (int j = 0; j < e.Item.Length; j++)
+                if (i <= 255)
                 {
-                    e.Item[j] = Rom.ReadByte();
-                    e.ItemChance[j] = Rom.Read24();
+                    Rom.SeekAdd(0xA);
+
+                    e.Bg = Rom.ReadUShort();
+                    e.MusicSwirl = Rom.ReadUShort();
+                    e.MusicBattle = Rom.ReadUShort();
+                    e.MusicWin = Rom.ReadUShort();
+
+                    e.Level = Rom.ReadUShort();
+                    e.Hp = Rom.ReadUInt();
+                    e.Pp = Rom.ReadUInt();
+                    e.Off = Rom.ReadByte();
+                    e.Def = Rom.ReadByte();
+                    e.Iq = Rom.ReadByte();
+                    e.Speed = Rom.ReadByte();
+
+                    Rom.SeekAdd(4);
+
+                    e.OffBack = Rom.ReadByte();
+                    e.DefBack = Rom.ReadByte();
+                    e.IqBack = Rom.ReadByte();
+                    e.SpeedBack = Rom.ReadByte();
+
+                    Rom.SeekAdd(4);
+
+                    for (int j = 0; j < e.Weaknesses.Length; j++)
+                        e.Weaknesses[j] = Rom.ReadUShort();
+
+                    for (int j = 0; j < e.Action.Length; j++)
+                        e.Action[j] = Rom.ReadUShort();
+
+                    Rom.SeekAdd(2);
+
+                    e.TextEncounter = Rom.ReadByte();
+                    e.TextDeath = Rom.ReadByte();
+
+                    Rom.SeekAdd(0x10);
+
+                    for (int j = 0; j < e.Item.Length; j++)
+                    {
+                        e.Item[j] = Rom.ReadByte();
+                        e.ItemChance[j] = Rom.Read24();
+                    }
+
+                    e.Exp = Rom.ReadUInt();
+                    e.Dp = Rom.ReadUInt();
+
+                    Rom.SeekAdd(4);
                 }
+                else
+                {
+                    e.Bg = 0;
+                    e.MusicSwirl = 0;
+                    e.MusicBattle = 0;
+                    e.MusicWin = 0;
+                    e.Level = 0;
+                    e.Hp = 0;
+                    e.Pp = 0;
+                    e.Off = 0;
+                    e.Def = 0;
+                    e.Iq = 0;
+                    e.Speed = 0;
+                    e.OffBack = 0;
+                    e.DefBack = 0;
+                    e.IqBack = 0;
+                    e.SpeedBack = 0;
+                    for (int j = 0; j < e.Weaknesses.Length; j++)
+                        e.Weaknesses[j] = 0;
 
-                e.Exp = Rom.ReadUInt();
-                e.Dp = Rom.ReadUInt();
+                    for (int j = 0; j < e.Action.Length; j++)
+                        e.Action[j] = 0;
+                    e.TextEncounter = 0;
+                    e.TextDeath = 0;
+                    for (int j = 0; j < e.Item.Length; j++)
+                    {
+                        e.Item[j] = 0;
+                        e.ItemChance[j] = 0;
+                    }
 
-                Rom.SeekAdd(4);
-
+                    e.Exp = 0;
+                    e.Dp = 0;
+                }
                 Enemies[i] = e;
             }
         }
 
         public void Save()
         {
-            Rom.Seek(Address + (index * Length));
-
-            Rom.SeekAdd(0xA);
-
-            Rom.WriteUShort(this.Bg);
-            Rom.WriteUShort(this.MusicSwirl);
-            Rom.WriteUShort(this.MusicBattle);
-            Rom.WriteUShort(this.MusicWin);
-
-            Rom.WriteUShort(this.Level);
-            Rom.WriteUInt(this.Hp);
-            Rom.WriteUInt(this.Pp);
-            Rom.WriteByte(this.Off);
-            Rom.WriteByte(this.Def);
-            Rom.WriteByte(this.Iq);
-            Rom.WriteByte(this.Speed);
-
-            Rom.SeekAdd(4);
-
-            Rom.WriteByte(this.OffBack);
-            Rom.WriteByte(this.DefBack);
-            Rom.WriteByte(this.IqBack);
-            Rom.WriteByte(this.SpeedBack);
-
-            Rom.SeekAdd(4);
-
-            for (int j = 0; j < this.Weaknesses.Length; j++)
-                Rom.WriteUShort(this.Weaknesses[j]);
-
-            for (int j = 0; j < this.Action.Length; j++)
-                Rom.WriteUShort(this.Action[j]);
-
-            Rom.SeekAdd(2);
-            
-            Rom.WriteByte(this.TextEncounter);
-            Rom.WriteByte(this.TextDeath);
-
-            Rom.SeekAdd(0x10);
-
-            for (int j = 0; j < this.Item.Length; j++)
+            if (index <= 255)
             {
-                Rom.WriteByte(this.Item[j]);
-                Rom.Write24(this.ItemChance[j]);
+                Rom.Seek(Address + (index * Length));
+
+                Rom.SeekAdd(0xA);
+
+                Rom.WriteUShort(this.Bg);
+                Rom.WriteUShort(this.MusicSwirl);
+                Rom.WriteUShort(this.MusicBattle);
+                Rom.WriteUShort(this.MusicWin);
+
+                Rom.WriteUShort(this.Level);
+                Rom.WriteUInt(this.Hp);
+                Rom.WriteUInt(this.Pp);
+                Rom.WriteByte(this.Off);
+                Rom.WriteByte(this.Def);
+                Rom.WriteByte(this.Iq);
+                Rom.WriteByte(this.Speed);
+
+                Rom.SeekAdd(4);
+
+                Rom.WriteByte(this.OffBack);
+                Rom.WriteByte(this.DefBack);
+                Rom.WriteByte(this.IqBack);
+                Rom.WriteByte(this.SpeedBack);
+
+                Rom.SeekAdd(4);
+
+                for (int j = 0; j < this.Weaknesses.Length; j++)
+                    Rom.WriteUShort(this.Weaknesses[j]);
+
+                for (int j = 0; j < this.Action.Length; j++)
+                    Rom.WriteUShort(this.Action[j]);
+
+                Rom.SeekAdd(2);
+
+                Rom.WriteByte(this.TextEncounter);
+                Rom.WriteByte(this.TextDeath);
+
+                Rom.SeekAdd(0x10);
+
+                for (int j = 0; j < this.Item.Length; j++)
+                {
+                    Rom.WriteByte(this.Item[j]);
+                    Rom.Write24(this.ItemChance[j]);
+                }
+
+                Rom.WriteUInt(this.Exp);
+                Rom.WriteUInt(this.Dp);
+
+                M3Rom.IsModified = true;
             }
-
-            Rom.WriteUInt(this.Exp);
-            Rom.WriteUInt(this.Dp);
-
-            M3Rom.IsModified = true;
         }
     }
 }
