@@ -53,9 +53,9 @@ namespace MOTHER3
 
                     if (!(transparent && (data[actualX, actualY] == 0)))
                     {
+                        if((offset>0))
                         ptr[offset] = (byte)(data[actualX, actualY] + palette);
                     }
-
                     offset++;
                 }
             }

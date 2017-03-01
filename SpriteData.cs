@@ -65,57 +65,80 @@ namespace MOTHER3
         private int index;
         public ushort SpriteCount;
         public Sprite[] Sprites;
-
         public static void Init()
         {
             for (int i = 0; i < 4; i++)
             {
                 Entries[i] = Rom.ReadInt(Address[i]);
                 InfoEntries[i] = new SpriteInfo[Entries[i]];
-
                 for (int j = 0; j < Entries[i]; j++)
                 {
-                    int a = GetPointer(i, j);
+                    int a;
+                    if ((j >= 0x2D0) && (i == 0) && (j < 0x3D0))
+                        a = -2;
+                    else
+                        a = GetPointer(i, j);
                     if (a == -1) continue;
 
                     var ie = new SpriteInfo();
                     ie.bank = i;
                     ie.index = j;
 
-                    Rom.Seek(a);
-                    Rom.SeekAdd(8);
-
-                    ie.SpriteCount = Rom.ReadUShort();
-                    ie.Sprites = new Sprite[ie.SpriteCount];
-                    for (int k = 0; k < ie.SpriteCount; k++)
+                    if (a > -2)
                     {
-                        var s = new Sprite();
-                        s.index = k;
+                        Rom.Seek(a);
+                        Rom.SeekAdd(8);
 
-                        s.SpriteCount = Rom.ReadUShort();
-                        s.Sprites = new OamSprite[s.SpriteCount];
-                        for (int m = 0; m < s.SpriteCount; m++)
+                        ie.SpriteCount = Rom.ReadUShort();
+                        ie.Sprites = new Sprite[ie.SpriteCount];
+                        for (int k = 0; k < ie.SpriteCount; k++)
                         {
-                            var o = new OamSprite();
+                            var s = new Sprite();
+                            s.index = k;
 
-                            o.CoordY = Rom.ReadSByte();
-                            o.CoordX = (short)Rom.ReadSByte();
+                            s.SpriteCount = Rom.ReadUShort();
+                            s.Sprites = new OamSprite[s.SpriteCount];
+                            for (int m = 0; m < s.SpriteCount; m++)
+                            {
+                                var o = new OamSprite();
 
-                            ushort ch = Rom.ReadUShort();
-                            o.Tile = (ushort)(ch & 0x3FF);
-                            o.FlipH = (ch & 0x400) != 0;
-                            o.FlipV = (ch & 0x800) != 0;
-                            o.ObjSize = (byte)((ch >> 12) & 3);
-                            o.ObjShape = (byte)((ch >> 14) & 3);
+                                o.CoordY = Rom.ReadSByte();
+                                o.CoordX = (short)Rom.ReadSByte();
 
-                            s.Sprites[m] = o;
+                                ushort ch = Rom.ReadUShort();
+                                o.Tile = (ushort)(ch & 0x3FF);
+                                o.FlipH = (ch & 0x400) != 0;
+                                o.FlipV = (ch & 0x800) != 0;
+                                o.ObjSize = (byte)((ch >> 12) & 3);
+                                o.ObjShape = (byte)((ch >> 14) & 3);
+
+                                s.Sprites[m] = o;
+                            }
+                            Rom.SeekAdd(2);
+
+                            ie.Sprites[k] = s;
                         }
-                        Rom.SeekAdd(2);
-
-                        ie.Sprites[k] = s;
                     }
-
-                    InfoEntries[i][j] = ie;
+                    /*else
+                    {
+                        ie.SpriteCount = 1;
+                        ie.Sprites = new Sprite[1];
+                        var s = new Sprite();
+                        s.index = 0;
+                        s.SpriteCount = 1;
+                        s.Sprites = new OamSprite[1];
+                        var o= new OamSprite();
+                        o.CoordX = 0;
+                        o.CoordY = 0;
+                        o.Tile = (ushort)(0+(j-0x2D0));
+                        o.FlipH = false;
+                        o.FlipV = false;
+                        o.ObjSize = 0;
+                        o.ObjShape = 0;
+                        s.Sprites[0] = o;
+                        ie.Sprites[0] = s;
+                    }*/
+                        InfoEntries[i][j] = ie;
                 }
             }
         }
@@ -270,19 +293,18 @@ namespace MOTHER3
     {
         public static int[] Address = { 0x14383E4, 0x194BC30, 0x1A012B8, 0x1A36AA0 };
         public static int[] Entries = new int[4];
-
         public static void Init()
         {
             for (int i = 0; i < 4; i++)
                 Entries[i] = Rom.ReadInt(Address[i]);
-
+            Entries[0] -= 1;
             // The first bank has an extra entry for the item pics, so let's remove that
-            Entries[0]--;
         }
 
         public static int GetPointer(int bank, int index)
         {
-            int a = Rom.ReadInt(Address[bank] + 4 + (index << 2));
+            int g = index;
+            int a = Rom.ReadInt(Address[bank] + 4 + (g << 2));
             if (a == -1) return -1;
 
             return Address[bank] + a;

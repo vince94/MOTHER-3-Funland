@@ -365,5 +365,10 @@ namespace MOTHER3Funland
         {
             Helpers.GraphicsCopy(sender);
         }
+
+        private void pIcon_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -91,9 +91,9 @@
             // 
             // tabMain
             // 
-            this.tabMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tabMain.Controls.Add(this.tabBasic);
             this.tabMain.Controls.Add(this.tabAilments);
             this.tabMain.Controls.Add(this.tabPsi);
@@ -399,9 +399,9 @@
             // 
             // flowGraphicsMain
             // 
-            this.flowGraphicsMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.flowGraphicsMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.flowGraphicsMain.Controls.Add(this.flowItemIcon);
             this.flowGraphicsMain.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowGraphicsMain.Location = new System.Drawing.Point(6, 6);
@@ -440,6 +440,7 @@
             this.pIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pIcon.TabIndex = 2;
             this.pIcon.TabStop = false;
+            this.pIcon.Click += new System.EventHandler(this.pIcon_Click);
             // 
             // mnuGraphics
             // 
@@ -447,13 +448,13 @@
             this.mnuGraphicsCopy,
             this.mnuGraphicsSave});
             this.mnuGraphics.Name = "mnuGraphics";
-            this.mnuGraphics.Size = new System.Drawing.Size(153, 70);
+            this.mnuGraphics.Size = new System.Drawing.Size(144, 48);
             // 
             // mnuGraphicsCopy
             // 
             this.mnuGraphicsCopy.Image = global::MOTHER3Funland.Properties.Resources.blue_document_copy;
             this.mnuGraphicsCopy.Name = "mnuGraphicsCopy";
-            this.mnuGraphicsCopy.Size = new System.Drawing.Size(152, 22);
+            this.mnuGraphicsCopy.Size = new System.Drawing.Size(143, 22);
             this.mnuGraphicsCopy.Text = "Copy";
             this.mnuGraphicsCopy.Click += new System.EventHandler(this.mnuGraphicsCopy_Click);
             // 
@@ -461,7 +462,7 @@
             // 
             this.mnuGraphicsSave.Image = global::MOTHER3Funland.Properties.Resources.disk;
             this.mnuGraphicsSave.Name = "mnuGraphicsSave";
-            this.mnuGraphicsSave.Size = new System.Drawing.Size(152, 22);
+            this.mnuGraphicsSave.Size = new System.Drawing.Size(143, 22);
             this.mnuGraphicsSave.Text = "Save image...";
             this.mnuGraphicsSave.Click += new System.EventHandler(this.mnuGraphicsSave_Click);
             // 
@@ -483,8 +484,8 @@
             // 
             // cboItem
             // 
-            this.cboItem.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboItem.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.cboItem.DataSource = null;
             this.cboItem.Location = new System.Drawing.Point(44, 12);
             this.cboItem.Name = "cboItem";

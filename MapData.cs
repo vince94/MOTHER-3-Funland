@@ -188,19 +188,21 @@ namespace MOTHER3
             public static void Init()
             {
                 Entries = Rom.ReadUShort(Address);
-                Sprites = new List<RoomSprites>[Entries / 5];
-
+                Sprites = new List<RoomSprites>[Entries];
+                int StartTable = 0x1132B58;
+                int[] Addresses = new int[Entries];
+                for (int i = 0; i < Entries * 4; i += 4)
+                    Addresses[i / 4] = StartTable + Rom[StartTable + 4 + i] + (Rom[StartTable + 5 + i] << 8) + (Rom[StartTable + 6 + i] << 16) + (Rom[StartTable + 7 + i] << 24);
                 for (int i = 0; i < Sprites.Length; i++)
                 {
-                    int pointer = GetPointer((i * 5) + 4);
+                    int pointer = Addresses[i];
                     Sprites[i] = new List<RoomSprites>();
                     Rom.Seek(pointer);
-
                     int j = 0;
                     while((Rom[pointer] & 1) != 0)
                     {
                         var s = new RoomSprites();
-                        s.room = i;
+                        s.room = i/5;
                         s.index = j;
 
                         Rom.SeekAdd(4);
@@ -229,10 +231,18 @@ namespace MOTHER3
                         j++;
                         pointer += 24;
                     }
-
-                    if (Sprites[i].Count > 0)
+                    if((Rom[pointer] & 1) == 0)
                     {
-                        var scriptNums = Sprites[i].Select(s => s.Script).ToArray();
+                        var s = new RoomSprites();
+                        s.room = i/5;
+                        s.index = j;
+                        s.Script = 0;
+                        s.Direction = 0;
+                        s.Sprite = 0;
+                        s.X = 0;
+                        s.Y = 0;
+                        Sprites[i].Add(s);
+                        pointer += 4;
                     }
                 }
             }
@@ -252,6 +262,26 @@ namespace MOTHER3
             RoomPal.Init();
             RoomSprites.Init();
         }
+        public static void RenderItems(BitmapData canvas, int index, int center_x, int center_y, bool transparent = true)
+        {
+            int Addresses = Rom.ReadInt(0x1439388) + 0x14383E4;
+            int tileAddress = Addresses + ((index * 9) << 5);
+            var Palette = Rom.ReadPal(GfxItems.GetPaletteAddress(index));
+            for (int y = 0; y < 24; y += 8)
+            {
+                for (int x = 0; x < 24; x += 8)
+                {
+                    byte[,] ch = Rom.Read4BppTile(tileAddress);
+                    tileAddress += 0x20;
+                    GfxProvider.RenderToBitmap(canvas, ch,
+                                    (x + center_x),
+                                    (y + center_y),
+                                    false, false,
+                                    0, transparent);
+                }
+            }
+        }
+
 
         public static Bitmap GetMap(int room, int flags, bool drawsprites)
         {
@@ -371,21 +401,29 @@ namespace MOTHER3
             }
 
             // Draw the sprites
-            if (drawsprites)
+            for (int j = 0; j <= 4; j++)
             {
-                for (int i = 0; i < RoomSprites.Sprites[room].Count; i++)
+                for (int i = 0; i < RoomSprites.Sprites[(room * 5) + j].Count; i++)
                 {
-                    var rs = RoomSprites.Sprites[room][i];
-                    if ((rs.Sprite == 0) || (rs.Sprite == 0xC0)) continue;
-
+                    var rs = RoomSprites.Sprites[(room * 5) + j][i];
                     var si = SpriteInfo.InfoEntries[0][rs.Sprite];
-                    var s = si.Sprites[rs.Direction % si.Sprites.Length];
-                    GfxProvider.RenderSprites(bd, rs.X, rs.Y, s.Sprites,
-                        Rom, SpriteGfx.GetPointer(0, rs.Sprite),
-                        SpritePalettes.GetPalette(rs.Sprite));
+                    if (((rs.Sprite == 0) || (rs.Sprite == 0xC0) || (room == 0xCB) || (room == 0x154) || (room == 0x37D))) continue;
+                    if ((rs.Sprite >= 0x2D0) && (rs.Sprite < 0x3D0))
+                    {
+                        // All item images are stored nice and linearly
+                        // Each item image is 3x3 tiles
+                        var index = rs.Sprite - 0x2D0;
+                        RenderItems(bd, index, rs.X-4, rs.Y-4);
+                    }
+                    else
+                    {
+                        var s = si.Sprites[rs.Direction % si.Sprites.Length];
+                        GfxProvider.RenderSprites(bd, rs.X, rs.Y, s.Sprites,
+                            Rom, SpriteGfx.GetPointer(0, rs.Sprite),
+                            SpritePalettes.GetPalette(rs.Sprite));
+                    }
                 }
             }
-
             bmp.UnlockBits(bd);
             return bmp;
         }
