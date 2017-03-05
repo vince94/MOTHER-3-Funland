@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Extensions;
 using GBA;
+using System.Windows.Forms;
 
 namespace MOTHER3
 {
@@ -262,7 +263,7 @@ namespace MOTHER3
             RoomPal.Init();
             RoomSprites.Init();
         }
-        public static void RenderItems(BitmapData canvas, int index, int center_x, int center_y, bool transparent = true)
+        public static void RenderItems(BitmapData canvas, int index, int center_x, int center_y, int Palnum, bool transparent = true)
         {
             int Addresses = Rom.ReadInt(0x1439388) + 0x14383E4;
             int tileAddress = Addresses + ((index * 9) << 5);
@@ -277,13 +278,180 @@ namespace MOTHER3
                                     (x + center_x),
                                     (y + center_y),
                                     false, false,
-                                    0, transparent);
+                                    Palnum, transparent);
                 }
             }
         }
+        public static Bitmap GetSprites(int canvas0Width, int canvas0Height, int room, CheckBox[] chkTable, out Bitmap Enemies, out Bitmap Enemies2)
+        {
+            var rInfo = RoomInfo.RoomInfoEntries[room];
+            var rGfxPal = SpritePalettes.DefaultPals;
 
+            // Get the width and height (in 16*16 tiles)
+            int w = rInfo.Width;
+            int h = rInfo.Height;
 
-        public static Bitmap GetMap(int room, int flags, bool drawsprites)
+            // Create the bitmap
+            Bitmap bmp = new Bitmap(canvas0Width, canvas0Height, PixelFormat.Format8bppIndexed);
+            Enemies = new Bitmap(canvas0Width, canvas0Height, PixelFormat.Format8bppIndexed);
+            Enemies2 = new Bitmap(canvas0Width, canvas0Height, PixelFormat.Format8bppIndexed);
+            Enemies.CopyPalette(rGfxPal, true);
+            Enemies2.CopyPalette(rGfxPal, true);
+            int Last = 0, palettenum=0;
+            List<int> Palettenum = new List<int>();
+            BitmapData bd = bmp.LockBits(ImageLockMode.WriteOnly);
+            BitmapData be = Enemies.LockBits(ImageLockMode.WriteOnly);
+            BitmapData be2 = Enemies2.LockBits(ImageLockMode.WriteOnly);
+            bmp.CopyPalette(rGfxPal, true);
+            for (int j = 0; j <= 4; j++)
+            {
+                if (chkTable[j].Checked == true)
+                {
+                    for (int i = 0; i < RoomSprites.Sprites[(room * 5) + j].Count; i++)
+                    {
+                        var rs = RoomSprites.Sprites[(room * 5) + j][i];
+                        if (!((rs.Sprite <= 0xFF) || (rs.Sprite >= 0x26C)))
+                        {
+                            MPalette[] NewestPalette;
+                            MPalette[] NewestPalette2;
+                            RenderPalette(SpritePalettes.GetPalette(rs.Sprite), Enemies.Palette, Enemies2.Palette, Last, out NewestPalette, out Last, out NewestPalette2, out palettenum);
+                            Palettenum.Add(palettenum);
+                            Enemies.CopyPalette(NewestPalette, true);
+                            Enemies2.CopyPalette(NewestPalette2, true);
+                        }
+                    }
+                }
+            }
+            int count = 0;
+                for (int j = 0; j <= 4; j++)
+            {
+                if (chkTable[j].Checked == true)
+                {
+                    for (int i = 0; i < RoomSprites.Sprites[(room * 5) + j].Count; i++)
+                    {
+                        var rs = RoomSprites.Sprites[(room * 5) + j][i];
+                        var si = SpriteInfo.InfoEntries[0][rs.Sprite];
+                        if ((rs.Sprite == 0) || (rs.Sprite == 0xC0)) continue;
+                        if ((rs.Sprite >= 0x2D0) && (rs.Sprite < 0x3D0))
+                        {
+                            // All item images are stored nice and linearly
+                            // Each item image is 3x3 tiles
+                            var index = rs.Sprite - 0x2D0;
+                            RenderItems(bd, index, rs.X, rs.Y, SpritePalettes.GetPalNum(rs.Sprite));
+                        }
+                        else
+                        {
+                            var s = si.Sprites[rs.Direction % si.Sprites.Length];
+                            if ((rs.Sprite <= 0xFF) || (rs.Sprite >= 0x26C))
+                                GfxProvider.RenderSprites(bd, rs.X, rs.Y, s.Sprites,
+                                    Rom, SpriteGfx.GetPointer(0, rs.Sprite),
+                                    SpritePalettes.GetPalNum(rs.Sprite));
+                            else
+                            {
+                                RenderEnemies(be, be2, rs.X, rs.Y, s.Sprites,
+                                    Rom, SpriteGfx.GetPointer(0, rs.Sprite),
+                                    Palettenum[count]);
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            Enemies2.UnlockBits(be2);
+            Enemies.UnlockBits(be);
+            bmp.UnlockBits(bd);
+            return bmp;
+        }
+        public static void RenderEnemies(BitmapData canvas, BitmapData canvas2, int center_x, int center_y, OamSprite[] oam, byte[] gfxData, int gfxPointer, int palettenum, bool transparent = true)
+        {
+            for (int priority = 3; priority >= 0; priority--)
+            {
+                for (int oamIndex = 0; oamIndex < oam.Length; oamIndex++)
+                {
+                    var o = oam[oamIndex];
+                    if (o.Priority == priority)
+                    {
+                        // Draw the subsprite
+                        int tilePointer = o.Tile << 5;
+                        for (int y = 0; y < o.Height; y += 8)
+                        {
+                            int actualY = o.FlipV ? (o.Height - y - 8) : y;
+
+                            for (int x = 0; x < o.Width; x += 8)
+                            {
+                                byte[,] pixelData = gfxData.Read4BppTile(gfxPointer + tilePointer);
+                                tilePointer += 0x20;
+                                int actualX = o.FlipH ? (o.Width - x - 8) : x;
+                                if (palettenum < 16)
+                                    GfxProvider.RenderToBitmap(canvas, pixelData,
+                                        (o.CoordX + center_x) + actualX,
+                                        (o.CoordY + center_y) + actualY,
+                                        o.FlipH, o.FlipV,
+                                        palettenum, transparent);
+                                else
+                                    GfxProvider.RenderToBitmap(canvas2, pixelData,
+                                        (o.CoordX + center_x) + actualX,
+                                        (o.CoordY + center_y) + actualY,
+                                        o.FlipH, o.FlipV,
+                                        palettenum-16, transparent);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public static void RenderPalette(MPalette Enemy, ColorPalette CanvasPal, ColorPalette CanvasPal2, int Latest, out MPalette[] UpdatePal, out int Last, out MPalette[] UpdatePal2, out int palettenum, bool transparent = true)
+        {
+            Last = Latest;
+            int u = 0;
+            palettenum = 0;
+            UpdatePal = new MPalette[16];
+            for (int k = 0; k < 16; k++)
+                UpdatePal[k] = new MPalette(1);
+            UpdatePal2 = new MPalette[16];
+            for (int k = 0; k < 16; k++)
+                UpdatePal2[k] = new MPalette(1);
+            for (int j = 0; j < 16; j++)
+                for (int i = 0; i < 16; i++)
+                    UpdatePal[j].Entries[0][i] = CanvasPal.Entries[(j * 16) + i];
+            for (int j = 0; j < 16; j++)
+                for (int i = 0; i < 16; i++)
+                    UpdatePal2[j].Entries[0][i] = CanvasPal2.Entries[(j * 16) + i];
+            for (int j = 0; j < Last; j++)
+            {
+                u = 0;
+                for (int i = 0; i < 16; i++)
+                {
+                    if (j <= 15) {
+                        if (CanvasPal.Entries[(j * 16) + i] == Enemy.Entries[0][i])
+                            u += 1; }
+                    else
+                    {
+                        if (CanvasPal2.Entries[((j-16) * 16) + i] == Enemy.Entries[0][i])
+                            u += 1;
+                    }
+                }
+                if ((u == 15))
+                {
+                    palettenum = j;
+                    u = 17;
+                    j = Last;
+                }
+            }
+            if ((u != 17) && (Last < 16))
+            {
+                palettenum = Last;
+                UpdatePal[Last] = Enemy;
+                Last += 1;
+            }
+            else if (u != 17)
+            {
+                palettenum = Last;
+                UpdatePal2[Last-16] = Enemy;
+                Last += 1;
+            }
+        }
+        public static Bitmap GetMap(int room, int flags)
         {
             var rInfo = RoomInfo.RoomInfoEntries[room];
             var rGfxPal = RoomGfxPal.RoomGfxPalEntries[room];
@@ -399,28 +567,243 @@ namespace MOTHER3
                     }
                 }
             }
+            bmp.UnlockBits(bd);
+            return bmp;
+        }
+        public static Bitmap GetLayer1(int room, int flags)
+        {
+            var rInfo = RoomInfo.RoomInfoEntries[room];
+            var rGfxPal = RoomGfxPal.RoomGfxPalEntries[room];
 
-            // Draw the sprites
-            for (int j = 0; j <= 4; j++)
+            // Get the width and height (in 16*16 tiles)
+            int w = rInfo.Width;
+            int h = rInfo.Height;
+
+            // Create the bitmap
+            Bitmap bmp = new Bitmap(w << 4, h << 4, PixelFormat.Format8bppIndexed);
+            BitmapData bd = bmp.LockBits(ImageLockMode.WriteOnly);
+
+            // Get the graphics
+            var gfx = RoomGfx.GetTilesets(rGfxPal);
+            int hash = gfx.GetHashCode();
+
+            // Get the tiles
+            var tiles = RoomTiles.GetTiles(room);
+            if (tiles == null) return null;
+
+            // Get the map
+            var map = new byte[1][];
+            for (int i = 2; i < 3; i++)
+                map[i - 2] = RoomMap.GetMap(room, i - 2);
+
+            // Get the palette
+            var pal = RoomPal.GetPalette(rGfxPal.Pal);
+            bmp.CopyPalette(pal, true);
+
+            // For each layer...
+            for (int layer = 0; layer >= 0; layer--)
             {
-                for (int i = 0; i < RoomSprites.Sprites[(room * 5) + j].Count; i++)
+                // Check if it's in the flags for rendering this layer
+                if (((flags & (1 << layer)) != 0) && (map[layer] != null))
                 {
-                    var rs = RoomSprites.Sprites[(room * 5) + j][i];
-                    var si = SpriteInfo.InfoEntries[0][rs.Sprite];
-                    if (((rs.Sprite == 0) || (rs.Sprite == 0xC0) || (room == 0xCB) || (room == 0x154) || (room == 0x37D))) continue;
-                    if ((rs.Sprite >= 0x2D0) && (rs.Sprite < 0x3D0))
+                    // Make sure the map is big enough: some of them aren't!
+                    if (map[layer].Length >= (w * h * 2))
                     {
-                        // All item images are stored nice and linearly
-                        // Each item image is 3x3 tiles
-                        var index = rs.Sprite - 0x2D0;
-                        RenderItems(bd, index, rs.X-4, rs.Y-4);
+                        // We're drawing it, so for each entry in the map...
+                        for (int mapy = 0; mapy < h; mapy++)
+                        {
+                            for (int mapx = 0; mapx < w; mapx++)
+                            {
+                                // Get the 16x16 tile number
+                                ushort ch = map[layer].ReadUShort((mapx + (mapy * w)) * 2);
+                                ushort tile16 = (ushort)(ch & 0x3FF);
+
+                                if ((tile16 >> 6) < 12)
+                                {
+                                    int tpal = (ch >> 10) & 0xF;
+
+                                    bool tflipx = (ch & 0x4000) != 0;
+                                    bool tflipy = (ch & 0x8000) != 0;
+
+                                    // For this tile... get the four 8x8 subtiles
+                                    int[,] tile8 = new int[2, 2];
+                                    bool[,] sflipx = new bool[2, 2];
+                                    bool[,] sflipy = new bool[2, 2];
+
+                                    uint magic = tiles.ReadUInt(tile16 * 8);
+
+                                    tile8[0, 0] = tiles[(tile16 * 8) + 4];
+                                    tile8[0, 1] = tiles[(tile16 * 8) + 5];
+                                    tile8[1, 0] = tiles[(tile16 * 8) + 6];
+                                    tile8[1, 1] = tiles[(tile16 * 8) + 7];
+
+                                    for (int i = 0; i < 2; i++)
+                                        for (int j = 0; j < 2; j++)
+                                        {
+                                            sflipx[i, j] = (tile8[i, j] & 0x40) != 0;
+                                            sflipy[i, j] = (tile8[i, j] & 0x80) != 0;
+
+                                            tile8[i, j] &= 0x3F;
+                                            tile8[i, j] |= (ch & 0x3C0);
+                                        }
+
+                                    // magic appears to contain some sort of tile mask...
+                                    uint mask = (magic >> 16) & 0xF;
+                                    if ((mask & 0x1) == 0) tile8[0, 0] = -1;
+                                    if ((mask & 0x2) == 0) tile8[0, 1] = -1;
+                                    if ((mask & 0x4) == 0) tile8[1, 0] = -1;
+                                    if ((mask & 0x8) == 0) tile8[1, 1] = -1;
+
+                                    // For each of these subtiles...
+                                    for (int tiley = 0; tiley < 2; tiley++)
+                                    {
+                                        for (int tilex = 0; tilex < 2; tilex++)
+                                        {
+                                            if (tile8[tiley, tilex] >= 0)
+                                            {
+                                                int tileset = tile8[tiley, tilex] >> 6;
+                                                int subtile = tile8[tiley, tilex] & 0x3F;
+
+                                                int tileoffset = subtile << 5;
+
+                                                var pixels = gfx[tileset].Read4BppTile(tileoffset);
+
+                                                int tx = tflipx ? 1 - tilex : tilex;
+                                                int ty = tflipy ? 1 - tiley : tiley;
+
+                                                GfxProvider.RenderToBitmap(bd, pixels,
+                                                    (mapx << 4) + (tx << 3),
+                                                    (mapy << 4) + (ty << 3),
+                                                    sflipx[tiley, tilex] ^ tflipx,
+                                                    sflipy[tiley, tilex] ^ tflipy,
+                                                    tpal, true);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                    else
+                    else return null;
+                }
+                else return null;
+            }
+            bmp.UnlockBits(bd);
+            return bmp;
+        }
+        public static Bitmap GetLayer2(int room, int flags)
+        {
+            var rInfo = RoomInfo.RoomInfoEntries[room];
+            var rGfxPal = RoomGfxPal.RoomGfxPalEntries[room];
+
+            // Get the width and height (in 16*16 tiles)
+            int w = rInfo.Width;
+            int h = rInfo.Height;
+
+            // Create the bitmap
+            Bitmap bmp = new Bitmap(w << 4, h << 4, PixelFormat.Format8bppIndexed);
+            BitmapData bd = bmp.LockBits(ImageLockMode.WriteOnly);
+
+            // Get the graphics
+            var gfx = RoomGfx.GetTilesets(rGfxPal);
+            int hash = gfx.GetHashCode();
+
+            // Get the tiles
+            var tiles = RoomTiles.GetTiles(room);
+            if (tiles == null) return null;
+
+            // Get the map
+            var map = new byte[1][];
+            for (int i = 1; i < 2; i++)
+                map[i - 1] = RoomMap.GetMap(room, i);
+
+            // Get the palette
+            var pal = RoomPal.GetPalette(rGfxPal.Pal);
+            bmp.CopyPalette(pal, true);
+
+            // For each layer...
+            for (int layer = 1; layer >= 1; layer--)
+            {
+                // Check if it's in the flags for rendering this layer
+                if (((flags & (1 << layer)) != 0) && (map[layer-1] != null))
+                {
+                    // Make sure the map is big enough: some of them aren't!
+                    if (map[layer-1].Length >= (w * h * 2))
                     {
-                        var s = si.Sprites[rs.Direction % si.Sprites.Length];
-                        GfxProvider.RenderSprites(bd, rs.X, rs.Y, s.Sprites,
-                            Rom, SpriteGfx.GetPointer(0, rs.Sprite),
-                            SpritePalettes.GetPalette(rs.Sprite));
+                        // We're drawing it, so for each entry in the map...
+                        for (int mapy = 0; mapy < h; mapy++)
+                        {
+                            for (int mapx = 0; mapx < w; mapx++)
+                            {
+                                // Get the 16x16 tile number
+                                ushort ch = map[layer-1].ReadUShort((mapx + (mapy * w)) * 2);
+                                ushort tile16 = (ushort)(ch & 0x3FF);
+
+                                if ((tile16 >> 6) < 12)
+                                {
+                                    int tpal = (ch >> 10) & 0xF;
+
+                                    bool tflipx = (ch & 0x4000) != 0;
+                                    bool tflipy = (ch & 0x8000) != 0;
+
+                                    // For this tile... get the four 8x8 subtiles
+                                    int[,] tile8 = new int[2, 2];
+                                    bool[,] sflipx = new bool[2, 2];
+                                    bool[,] sflipy = new bool[2, 2];
+
+                                    uint magic = tiles.ReadUInt(tile16 * 8);
+
+                                    tile8[0, 0] = tiles[(tile16 * 8) + 4];
+                                    tile8[0, 1] = tiles[(tile16 * 8) + 5];
+                                    tile8[1, 0] = tiles[(tile16 * 8) + 6];
+                                    tile8[1, 1] = tiles[(tile16 * 8) + 7];
+
+                                    for (int i = 0; i < 2; i++)
+                                        for (int j = 0; j < 2; j++)
+                                        {
+                                            sflipx[i, j] = (tile8[i, j] & 0x40) != 0;
+                                            sflipy[i, j] = (tile8[i, j] & 0x80) != 0;
+
+                                            tile8[i, j] &= 0x3F;
+                                            tile8[i, j] |= (ch & 0x3C0);
+                                        }
+
+                                    // magic appears to contain some sort of tile mask...
+                                    uint mask = (magic >> 16) & 0xF;
+                                    if ((mask & 0x1) == 0) tile8[0, 0] = -1;
+                                    if ((mask & 0x2) == 0) tile8[0, 1] = -1;
+                                    if ((mask & 0x4) == 0) tile8[1, 0] = -1;
+                                    if ((mask & 0x8) == 0) tile8[1, 1] = -1;
+
+                                    // For each of these subtiles...
+                                    for (int tiley = 0; tiley < 2; tiley++)
+                                    {
+                                        for (int tilex = 0; tilex < 2; tilex++)
+                                        {
+                                            if (tile8[tiley, tilex] >= 0)
+                                            {
+                                                int tileset = tile8[tiley, tilex] >> 6;
+                                                int subtile = tile8[tiley, tilex] & 0x3F;
+
+                                                int tileoffset = subtile << 5;
+
+                                                var pixels = gfx[tileset].Read4BppTile(tileoffset);
+
+                                                int tx = tflipx ? 1 - tilex : tilex;
+                                                int ty = tflipy ? 1 - tiley : tiley;
+
+                                                GfxProvider.RenderToBitmap(bd, pixels,
+                                                    (mapx << 4) + (tx << 3),
+                                                    (mapy << 4) + (ty << 3),
+                                                    sflipx[tiley, tilex] ^ tflipx,
+                                                    sflipy[tiley, tilex] ^ tflipy,
+                                                    tpal, true);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

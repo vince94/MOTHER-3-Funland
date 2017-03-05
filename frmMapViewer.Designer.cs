@@ -45,6 +45,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.SystemColors.Control;
             this.label1.Location = new System.Drawing.Point(12, 15);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
@@ -53,12 +54,13 @@
             // 
             // pnlMap
             // 
-            this.pnlMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlMap.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlMap.AutoScroll = true;
+            this.pnlMap.BackColor = System.Drawing.SystemColors.Control;
             this.pnlMap.Controls.Add(this.pMap);
-            this.pnlMap.Location = new System.Drawing.Point(0, 62);
+            this.pnlMap.Location = new System.Drawing.Point(0, 82);
             this.pnlMap.Name = "pnlMap";
             this.pnlMap.Size = new System.Drawing.Size(484, 400);
             this.pnlMap.TabIndex = 4;
@@ -85,7 +87,7 @@
             // 
             this.mnuMapCopy.Image = global::MOTHER3Funland.Properties.Resources.blue_document_copy;
             this.mnuMapCopy.Name = "mnuMapCopy";
-            this.mnuMapCopy.Size = new System.Drawing.Size(152, 22);
+            this.mnuMapCopy.Size = new System.Drawing.Size(143, 22);
             this.mnuMapCopy.Text = "Copy";
             this.mnuMapCopy.Click += new System.EventHandler(this.mnuMapCopy_Click);
             // 
@@ -93,7 +95,7 @@
             // 
             this.mnuMapSave.Image = global::MOTHER3Funland.Properties.Resources.disk;
             this.mnuMapSave.Name = "mnuMapSave";
-            this.mnuMapSave.Size = new System.Drawing.Size(152, 22);
+            this.mnuMapSave.Size = new System.Drawing.Size(143, 22);
             this.mnuMapSave.Text = "Save image...";
             this.mnuMapSave.Click += new System.EventHandler(this.mnuMapSave_Click);
             // 
@@ -103,8 +105,10 @@
             // 
             // cboRoom
             // 
-            this.cboRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboRoom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboRoom.BackColor = System.Drawing.SystemColors.Control;
+            this.cboRoom.DataSource = null;
             this.cboRoom.Location = new System.Drawing.Point(53, 12);
             this.cboRoom.Name = "cboRoom";
             this.cboRoom.SelectedIndex = -1;
@@ -116,6 +120,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(484, 462);
             this.Controls.Add(this.cboRoom);
             this.Controls.Add(this.pnlMap);
@@ -132,7 +137,6 @@
             this.PerformLayout();
 
         }
-
         #endregion
 
         private System.Windows.Forms.Label label1;

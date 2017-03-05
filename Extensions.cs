@@ -604,7 +604,7 @@ namespace Extensions
         public static void CopyPalette(this Bitmap bmp, MPalette pal, bool transparent)
         {
             ColorPalette cp = bmp.Palette;
-            
+
             for (int i = 0; i < Math.Min(256, pal.ColorCount); i++)
                 cp.Entries[i] = pal.GetColorAt(i);
             for (int i = Math.Min(256, pal.ColorCount); i < 256; i++)
@@ -615,7 +615,20 @@ namespace Extensions
 
             bmp.Palette = cp;
         }
+        public static void CopyPalette(this Bitmap bmp, MPalette[] pal, bool transparent)
+        {
+            ColorPalette cp = bmp.Palette;
+            for (int u = 0; u< 16; u++) {
+                for (int i = 0; i < Math.Min(256, (pal[u].ColorCount)); i++)
+                    cp.Entries[i+(u*16)] = pal[u].GetColorAt(i);
+                for (int i = Math.Min(256, (pal[u].ColorCount)); i < (256-(u*16)); i++)
+                    cp.Entries[i+(u * 16)] = Color.Black;
 
+                if (transparent)
+                    cp.Entries[0+(u * 16)] = Color.Transparent;
+            }
+            bmp.Palette = cp;
+        }
         public unsafe static Bitmap ToRaster(this Bitmap bmp)
         {
             var ret = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);

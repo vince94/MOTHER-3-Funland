@@ -45,28 +45,63 @@ namespace MOTHER3
             palette <<= 4;
             for (int y = 0; y < 8; y++)
             {
-                int offset = ((destY + y) * bd.Stride) + destX;
-                int actualY = flipY ? (7 - y) : y;
-                for (int x = 0; x < 8; x++)
+                if ((destY + y) < bd.Height)
                 {
-                    int actualX = flipX ? (7 - x) : x;
-
-                    if (!(transparent && (data[actualX, actualY] == 0)))
+                    int offset = ((destY + y) * bd.Stride) + destX;
+                    int actualY = flipY ? (7 - y) : y;
+                    for (int x = 0; x < 8; x++)
                     {
-                        if((offset>0))
-                        ptr[offset] = (byte)(data[actualX, actualY] + palette);
+                        int actualX = flipX ? (7 - x) : x;
+
+                        if (!(transparent && (data[actualX, actualY] == 0)))
+                        {
+                            if ((offset > 0))
+                                ptr[offset] = (byte)(data[actualX, actualY] + palette);
+                        }
+                        offset++;
                     }
-                    offset++;
                 }
             }
         }
-
         public static Bitmap RenderSprites(OamSprite[] oam, byte[] gfxData, MPalette palette)
         {
             return RenderSprites(oam, gfxData, 0, palette);
         }
 
-        public static void RenderSprites(BitmapData canvas, int center_x, int center_y, OamSprite[] oam, byte[] gfxData, int gfxPointer, MPalette palette, bool transparent = true)
+        public static void RenderSprites(BitmapData canvas, int center_x, int center_y, OamSprite[] oam, byte[] gfxData, int gfxPointer, int palettenum, bool transparent = true)
+        {
+            for (int priority = 3; priority >= 0; priority--)
+            {
+                for (int oamIndex = 0; oamIndex < oam.Length; oamIndex++)
+                {
+                    var o = oam[oamIndex];
+                    if (o.Priority == priority)
+                    {
+                        // Draw the subsprite
+                        int tilePointer = o.Tile << 5;
+                        for (int y = 0; y < o.Height; y += 8)
+                        {
+                            int actualY = o.FlipV ? (o.Height - y - 8) : y;
+
+                            for (int x = 0; x < o.Width; x += 8)
+                            {
+                                byte[,] pixelData = gfxData.Read4BppTile(gfxPointer + tilePointer);
+                                tilePointer += 0x20;
+
+                                int actualX = o.FlipH ? (o.Width - x - 8) : x;
+
+                                GfxProvider.RenderToBitmap(canvas, pixelData,
+                                    (o.CoordX + center_x) + actualX,
+                                    (o.CoordY + center_y) + actualY,
+                                    o.FlipH, o.FlipV,
+                                    palettenum, transparent);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public static void RenderSprites(BitmapData canvas, int center_x, int center_y, OamSprite[] oam, byte[] gfxData, int gfxPointer, MPalette palettenum, bool transparent = true)
         {
             for (int priority = 3; priority >= 0; priority--)
             {
