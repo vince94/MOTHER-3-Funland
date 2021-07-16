@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using Extensions;
+using MOTHER3;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Threading;
-using System.Diagnostics;
-using Extensions;
-using MOTHER3;
 
 namespace MOTHER3Funland
 {
@@ -110,7 +103,7 @@ namespace MOTHER3Funland
                     int index = (int)cb.Tag;
                     pLayer[index].Image = GfxBattleBg.GetLayer(cb.SelectedIndex);
                 };
-                
+
                 this.Controls.Add(c);
                 cboLayer[i] = c;
 
@@ -134,7 +127,7 @@ namespace MOTHER3Funland
                 this.Controls.Add(t);
                 txtAlpha[i] = t;
             }
-            
+
             // Load the entry list
             loading = true;
             for (int i = 0; i < GfxBattleBg.MasterEntries; i++)

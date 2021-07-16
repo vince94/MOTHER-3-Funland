@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Extensions;
+﻿using Extensions;
 
 namespace MOTHER3
 {
@@ -59,7 +55,7 @@ namespace MOTHER3
         //        #8: Burned
         //        #9: Solidified
         //        #10: Numbness? (Manly Bandana)
-        // +0x36 [1]: PK Love? 
+        // +0x36 [1]: PK Love?
         // +0x37 [1]: PK Fire?
         // +0x38 [1]: PK Freeze?
         // +0x39 [1]: PK Thunder?

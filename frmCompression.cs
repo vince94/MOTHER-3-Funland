@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using GBA;
+using MOTHER3;
+using System;
 using System.IO;
 using System.Windows.Forms;
-using GBA;
-using MOTHER3;
-using Extensions;
 
 namespace MOTHER3Funland
 {

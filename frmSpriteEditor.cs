@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Extensions;
+using MOTHER3;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Extensions;
-using MOTHER3;
 
 namespace MOTHER3Funland
 {

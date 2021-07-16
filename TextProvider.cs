@@ -1,14 +1,14 @@
-using System;
-using System.Text;
-using System.Collections.Generic;
 using Extensions;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace MOTHER3
 {
     // TODO: Control codes for EnglishShort
 
     public class TextProvider : M3Rom
-    {    
+    {
         public static Encoding SJIS = Encoding.GetEncoding(932);
         public static Encoding Unicode = Encoding.Unicode;
 
@@ -21,7 +21,7 @@ namespace MOTHER3
         public static ushort[] JapaneseAsciiMap = new ushort[128];
 
         public static void Init()
-        {    
+        {
             #region EnglishMap
             EnglishMap[0] = '\uFEFF';
             EnglishMap[1] = '!';
@@ -118,11 +118,11 @@ namespace MOTHER3
             EnglishMap[92] = '♪';
             EnglishMap[93] = '}';
             EnglishMap[94] = '~';
-            
+
             //95-157
             for (int i = 95; i <= 157; i++)
                 EnglishMap[i] = '?';
-            
+
             EnglishMap[158] = ' ';
             EnglishMap[159] = '@';
             EnglishMap[160] = '!';
@@ -203,13 +203,13 @@ namespace MOTHER3
             EnglishMap[235] = '\uFEFF';
             EnglishMap[236] = '♥';
             #endregion
-            
+
             for (int i = 0; i < EnglishMap.Length; i++)
             {
                 if (!EnglishMapInverse.ContainsKey (EnglishMap[i]))
                     EnglishMapInverse.Add (EnglishMap[i], (byte)i);
             }
-            
+
             for (ushort i = 0; i < JapaneseMap.Length; i++)
             {
                 // There's no space character...
@@ -538,20 +538,20 @@ namespace MOTHER3
             }
         }
     }
-    
+
     public class TextItemNames : M3Rom
     {
         public static int Address = -1;
         public static int Length = -1;
         public static int Entries = -1;
-        
+
         public static void Init()
         {
             Address = Rom.ReadInt (0xD1EE84) + 0xD1EE78;
             Length = Rom.ReadUShort(Address);
             Entries = Rom.ReadUShort(Address + 2);
         }
-        
+
         public static string GetName(int index)
         {
             return TextProvider.GetText (Address + 4 + (index * Length * 2), Length,
@@ -564,7 +564,7 @@ namespace MOTHER3
                 (Version == RomVersion.Japanese) ? TextType.Japanese : TextType.EnglishWide, str);
         }
     }
-    
+
     public class TextEnemyNames : M3Rom
     {
         public static int Address = -1;
@@ -577,7 +577,7 @@ namespace MOTHER3
             Length = Rom.ReadUShort(Address);
             Entries = Rom.ReadUShort(Address + 2);
         }
-        
+
         public static string GetName(int index)
         {
             return TextProvider.GetText (Address + 4 + (index * Length * 2), Length,

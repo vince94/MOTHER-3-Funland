@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Threading;
-using Extensions;
+﻿using Extensions;
 using MOTHER3;
+using System;
+using System.Drawing;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace MOTHER3Funland
 {
@@ -63,7 +58,7 @@ namespace MOTHER3Funland
                 tabAilments.Controls.Add(t);
                 txtAilment[i] = t;
             }
-            
+
             // Draw the PSI stuff
             string[] psi = { "PK Love", "PK Fire", "PK Freeze", "PK Thunder", "Bomb" };
             for (int i = 0; i < 5; i++)
@@ -218,7 +213,7 @@ namespace MOTHER3Funland
                 HighlightControl(txtSell);
                 return;
             }
-            
+
             // HP
             try
             {
@@ -306,7 +301,7 @@ namespace MOTHER3Funland
                 HighlightControl(txtHp2);
                 return;
             }
-            
+
             // Item type
             id.ItemType = (byte)cboItemType.SelectedIndex;
 

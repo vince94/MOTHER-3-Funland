@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Extensions;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Extensions;
 
 namespace MOTHER3
 {
@@ -29,7 +26,7 @@ namespace MOTHER3
                 {
                     int ch = Rom.ReadUShort();
                     MusicTableEntries[i].Data[j] = ch;
-                    
+
                     if (j == 1)
                     {
                         TableLookup.Add(ch, MusicTableEntries[i].Data[0]);

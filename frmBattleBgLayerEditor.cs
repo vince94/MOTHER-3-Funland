@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+﻿using Extensions;
 using MOTHER3;
-using Extensions;
+using System;
 
 namespace MOTHER3Funland
 {
@@ -157,7 +150,7 @@ namespace MOTHER3Funland
                 txtArrEntry.SelectAll();
                 return;
             }*/
-            
+
             // Pal dir
             try
             {
@@ -168,7 +161,7 @@ namespace MOTHER3Funland
                 txtPalDir.SelectAll();
                 return;
             }
-            
+
             // Pal start
             try
             {
@@ -179,7 +172,7 @@ namespace MOTHER3Funland
                 txtPalStart.SelectAll();
                 return;
             }
-            
+
             // Pal end
             try
             {
@@ -190,7 +183,7 @@ namespace MOTHER3Funland
                 txtPalEnd.SelectAll();
                 return;
             }
-            
+
             // Pal delay
             try
             {
@@ -201,7 +194,7 @@ namespace MOTHER3Funland
                 txtPalDelay.SelectAll();
                 return;
             }
-            
+
             // Drift H
             try
             {
@@ -212,7 +205,7 @@ namespace MOTHER3Funland
                 txtDriftH.SelectAll();
                 return;
             }
-            
+
             // Drift V
             try
             {
@@ -234,7 +227,7 @@ namespace MOTHER3Funland
                 txtAmplH.SelectAll();
                 return;
             }
-            
+
             // Ampl V
             try
             {

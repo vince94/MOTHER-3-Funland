@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Extensions;
+using GBA;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
-using Extensions;
-using GBA;
+using System.Linq;
 
 namespace MOTHER3
 {
@@ -182,7 +181,7 @@ namespace MOTHER3
         {
             // Construct the bitmap
             Bitmap bmp = new Bitmap(tileWidth << 3, tileHeight << 3, PixelFormat.Format8bppIndexed);
-            
+
             // Create the palette
             bmp.CopyPalette(palette, transparent);
 
@@ -264,7 +263,7 @@ namespace MOTHER3
 
         // Returns the arrangement, palette, and a flag indicating whether or not colors were dropped
         unsafe public static object[] SetArrangement(Bitmap _bmp,
-            byte[] gfxData, int gfxDataOffset, int tileCount, 
+            byte[] gfxData, int gfxDataOffset, int tileCount,
             bool useTileset, bool useFlipping,
             Color[] _pal, int palIndex,
             Color transparentColor, bool transparency
@@ -1269,11 +1268,11 @@ namespace MOTHER3
         public static ArrEntry[] GetArr(int index)
         {
             ArrEntry[] ret = new ArrEntry[64 * 64];
-            
+
             int[] arrEntry = GetEntry(index);
             if (arrEntry[1] != (ret.Length << 1))
                 return null;
-            
+
             Rom.Seek(arrEntry[0]);
             for (int sy = 0; sy < 2; sy++)
                 for (int sx = 0; sx < 2; sx++)

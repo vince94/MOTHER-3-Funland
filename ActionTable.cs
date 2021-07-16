@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Extensions;
+﻿using Extensions;
 
 namespace MOTHER3
 {
@@ -12,7 +8,7 @@ namespace MOTHER3
         public static int Length = 0x30;
         public static int Entries = 650;
         public static ActionTable[] Actions = new ActionTable[Entries];
-        
+
         // Entry 0x12 is the battle text number
         public ushort[] Data = new ushort[Length >> 1];
 

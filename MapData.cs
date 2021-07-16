@@ -1,13 +1,8 @@
-﻿using System;
+﻿using Extensions;
+using GBA;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Runtime.InteropServices;
-using Extensions;
-using GBA;
 using System.Windows.Forms;
 
 namespace MOTHER3

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Extensions;
+using MOTHER3;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using MOTHER3;
-using Extensions;
 
 namespace MOTHER3Funland
 {
@@ -251,7 +247,7 @@ namespace MOTHER3Funland
         public ArrangementEditor()
         {
             InitializeComponent();
-            
+
             // Add some mouse handlers for the arrangement
             pArr.MouseDown += new MouseEventHandler(pArr_MouseClick);
             pArr.MouseMove += new MouseEventHandler(pArr_MouseClick);

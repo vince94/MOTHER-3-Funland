@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Extensions;
 using System.Drawing;
-using Extensions;
-using GBA;
 
 namespace MOTHER3
 {

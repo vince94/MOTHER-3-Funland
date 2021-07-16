@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+﻿using Extensions;
 using MOTHER3;
-using Extensions;
+using System;
+using System.Windows.Forms;
 
 namespace MOTHER3Funland
 {
@@ -16,7 +10,7 @@ namespace MOTHER3Funland
         bool loading = false;
 
         TextBox[] txtName = new TextBox[7];
-        
+
         // Text cache
         string[] charnames = new string[10];
 

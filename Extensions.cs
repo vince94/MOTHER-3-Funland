@@ -1,22 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Drawing.Imaging;
 using MOTHER3;
 using MOTHER3Funland;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace Extensions
 {
     public static class DataOps
     {
         public static int Offset = 0;
-        
+
         public static void Seek(this byte[] rom, int offset)
         {
             Offset = offset;
         }
-        
+
         public static void SeekAdd(this byte[] rom, int offset)
         {
             Offset += offset;
@@ -85,7 +85,7 @@ namespace Extensions
             Offset += 2;
             return ret;
         }
-        
+
         public static short ReadShort(this byte[] rom, int offset)
         {
             return (short)(rom[offset] | (rom[offset + 1] << 8));
@@ -109,7 +109,7 @@ namespace Extensions
             Offset += 2;
             return ret;
         }
-        
+
         public static ushort ReadUShort(this byte[] rom, int offset)
         {
             return (ushort)ReadShort (rom, offset);
@@ -158,7 +158,7 @@ namespace Extensions
             Offset += 4;
             return ret;
         }
-        
+
         public static int ReadInt(this byte[] rom, int offset)
         {
             return rom[offset] | (rom[offset + 1] << 8) |
@@ -185,7 +185,7 @@ namespace Extensions
             Offset += 4;
             return ret;
         }
-        
+
         public static uint ReadUInt(this byte[] rom, int offset)
         {
             return (uint)ReadInt (rom, offset);

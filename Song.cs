@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Extensions;
+﻿using Extensions;
 
 // Documentation: http://www.romhacking.net/documents/%5b462%5dsappy.txt
 

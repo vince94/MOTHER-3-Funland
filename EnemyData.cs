@@ -1,4 +1,3 @@
-using System;
 using Extensions;
 
 namespace MOTHER3
@@ -11,7 +10,7 @@ namespace MOTHER3
         public static int Length = 144;
         public static int Entries = 257;
         public static EnemyData[] Enemies = new EnemyData[Entries];
-        
+
         private int index;
 
         public ushort Bg;
@@ -24,7 +23,7 @@ namespace MOTHER3
         public uint Exp;
         public uint Dp;
         public ushort Level;
-        
+
         public byte Off;
         public byte Def;
         public byte Iq;

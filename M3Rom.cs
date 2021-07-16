@@ -1,8 +1,4 @@
-using System;
-using System.Linq;
 using System.IO;
-using Extensions;
-using System.Drawing;
 
 namespace MOTHER3
 {
@@ -104,7 +100,7 @@ namespace MOTHER3
             return 0;
         }
     }
-    
+
     public enum RomVersion
     {
         Japanese,
